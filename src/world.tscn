@@ -6,7 +6,7 @@
 script/source = "extends KinematicBody2D
 
 export var _speed = 100
-export var _acceleration = 100
+export var _acceleration = 500
 
 var _velocity = Vector2.ZERO
 
@@ -16,11 +16,7 @@ func _physics_process(delta: float) -> void:
 		Input.get_action_strength(\"player_move_down\") - Input.get_action_strength(\"player_move_up\")
 	).normalized()
 	
-	if direction == Vector2.ZERO:
-		_velocity = _velocity.move_toward(Vector2.ZERO, _acceleration * delta)
-	else:
-		_velocity += direction * _acceleration * delta
-		_velocity = _velocity.clamped(_speed)
+	_velocity = _velocity.move_toward(direction * _speed, _acceleration * delta)
 		
 	move_and_collide(_velocity * delta)
 "
