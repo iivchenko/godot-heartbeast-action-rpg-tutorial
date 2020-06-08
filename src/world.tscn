@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/sprites/player/player.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+export var _speed = 100
+export var _acceleration = 100
+
+var _velocity = Vector2.ZERO
+
+func _physics_process(delta: float) -> void:
+	var direction = Vector2(
+		Input.get_action_strength(\"player_move_right\") - Input.get_action_strength(\"player_move_left\"),
+		Input.get_action_strength(\"player_move_down\") - Input.get_action_strength(\"player_move_up\")
+	).normalized()
+	
+	if direction == Vector2.ZERO:
+		_velocity = _velocity.move_toward(Vector2.ZERO, _acceleration * delta)
+	else:
+		_velocity += direction * _acceleration * delta
+		_velocity = _velocity.clamped(_speed)
+		
+	move_and_collide(_velocity * delta)
+"
+
+[node name="World" type="Node2D"]
+
+[node name="Player" type="KinematicBody2D" parent="."]
+position = Vector2( 131.566, 62.4624 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player"]
+texture = ExtResource( 1 )
+hframes = 60
