@@ -1,2 +1,5 @@
 # godot
 .import/
+
+# custom
+.tools/
