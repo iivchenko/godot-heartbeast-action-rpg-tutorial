@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/sprites/player/player.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends KinematicBody2D
+
+export var _speed = 100
+export var _acceleration = 500
+
+var _velocity = Vector2.ZERO
+
+func _physics_process(delta: float) -> void:
+	var direction = Vector2(
+		Input.get_action_strength(\"player_move_right\") - Input.get_action_strength(\"player_move_left\"),
+		Input.get_action_strength(\"player_move_down\") - Input.get_action_strength(\"player_move_up\")
+	).normalized()
+	
+	_velocity = _velocity.move_toward(direction * _speed, _acceleration * delta)
+		
+	_velocity = move_and_slide(_velocity)
+"
+
+[sub_resource type="CapsuleShape2D" id=2]
+radius = 3.6072
+height = 5.29993
+
+[node name="Player" type="KinematicBody2D"]
+script = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 1.02234, -9.18377 )
+texture = ExtResource( 1 )
+hframes = 60
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( -0.00216675, 0.0794144 )
+rotation = -1.5708
+shape = SubResource( 2 )
