@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=2]
+[gd_scene load_steps=45 format=2]
 
 [ext_resource path="res://assets/sprites/player/player.png" type="Texture" id=1]
 
@@ -11,6 +11,7 @@ export var _speed = 100
 export var _acceleration = 500
 
 var _velocity = Vector2.ZERO
+var _direction = Vector2.DOWN
 var _state = IDLE
 
 onready var _animationPlayer = $AnimationPlayer
@@ -19,32 +20,48 @@ func _physics_process(delta: float) -> void:
 	match _state:
 		IDLE: _idle()
 		MOVE: _move(delta)
-		ATTACK: pass
+		ATTACK: _attack()
 		ROLL: pass
-	
+
 
 func _idle() -> void:
-	if _get_direction() != Vector2.ZERO:
+	
+	_animationPlayer.stop()
+	_animationPlayer.frame = 0
+		
+	if Input.is_action_just_pressed(\"player_attack\"):
+		_state = ATTACK
+	elif _get_direction() != Vector2.ZERO:
 		_state = MOVE
-	elif _animationPlayer.playing == true:
-		_animationPlayer.stop()
-		_animationPlayer.frame = 0
-	
-	
+
+
 func _move(delta: float) -> void:
-	var direction = _get_direction()
-	
-	if direction == Vector2.ZERO and _velocity == Vector2.ZERO: 
-		_state = IDLE
+	if Input.is_action_just_pressed(\"player_attack\"):
+		_state = ATTACK
+		_animationPlayer.stop()
+		_velocity = Vector2.ZERO
 	else:	
-		match _to_animation(direction):
-			\"none\":
-				pass
-			var animation:
-				_animationPlayer.play(animation)
-			
-		_velocity = _velocity.move_toward(direction.normalized() * _speed, _acceleration * delta)		
-		_velocity = move_and_slide(_velocity)
+		var direction = _get_direction()
+		
+		if direction == Vector2.ZERO and _velocity == Vector2.ZERO: 
+			_state = IDLE
+		else:
+			_direction = _direction if direction == Vector2.ZERO else direction	
+			match _as_string(_direction):
+				\"none\":
+					pass
+				var animation:
+					_animationPlayer.play(\"move_%s\" % animation)
+				
+			_velocity = _velocity.move_toward(direction.normalized() * _speed, _acceleration * delta)
+			_velocity = move_and_slide(_velocity)
+
+
+func _attack() -> void:
+	if _animationPlayer.playing == false:
+		_animationPlayer.play(\"attack_%s\" % _as_string(_direction))
+		yield(_animationPlayer, \"animation_finished\")
+		_state = IDLE
 
 
 func _get_direction() -> Vector2:
@@ -54,140 +71,224 @@ func _get_direction() -> Vector2:
 			)
 
 
-func _to_animation(direction: Vector2) -> String:
+func _as_string(direction: Vector2) -> String:
 	match [direction.x, direction.y]:
 		[1.0, 0.0], [1.0, 1.0], [1.0, -1.0]:
-			return \"move_right\"
+			return \"right\"
 		[-1.0, 0.0], [-1.0, 1.0], [-1.0, -1.0]:
-			return \"move_left\"
+			return \"left\"
 		[0.0, 1.0]:
-			return \"move_down\"
+			return \"down\"
 		[0.0, -1.0]:
-			return \"move_up\"
+			return \"up\"
 		_:
 			return \"none\"
 "
 
 [sub_resource type="AtlasTexture" id=2]
 atlas = ExtResource( 1 )
-region = Rect2( 768, 0, 64, 64 )
+region = Rect2( 2048, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 1 )
-region = Rect2( 832, 0, 64, 64 )
+region = Rect2( 2112, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=4]
 atlas = ExtResource( 1 )
-region = Rect2( 896, 0, 64, 64 )
+region = Rect2( 2176, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 1 )
-region = Rect2( 960, 0, 64, 64 )
+region = Rect2( 2240, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=6]
 atlas = ExtResource( 1 )
-region = Rect2( 1024, 0, 64, 64 )
+region = Rect2( 2304, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=7]
 atlas = ExtResource( 1 )
-region = Rect2( 1088, 0, 64, 64 )
+region = Rect2( 2368, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=8]
 atlas = ExtResource( 1 )
-region = Rect2( 0, 0, 64, 64 )
+region = Rect2( 2432, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=9]
 atlas = ExtResource( 1 )
-region = Rect2( 64, 0, 64, 64 )
+region = Rect2( 2496, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=10]
 atlas = ExtResource( 1 )
-region = Rect2( 128, 0, 64, 64 )
+region = Rect2( 1152, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=11]
 atlas = ExtResource( 1 )
-region = Rect2( 192, 0, 64, 64 )
+region = Rect2( 1216, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 1 )
-region = Rect2( 256, 0, 64, 64 )
+region = Rect2( 1280, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=13]
 atlas = ExtResource( 1 )
-region = Rect2( 320, 0, 64, 64 )
+region = Rect2( 1344, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=14]
 atlas = ExtResource( 1 )
-region = Rect2( 1152, 0, 64, 64 )
+region = Rect2( 1408, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=15]
 atlas = ExtResource( 1 )
-region = Rect2( 1216, 0, 64, 64 )
+region = Rect2( 1472, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=16]
 atlas = ExtResource( 1 )
-region = Rect2( 1280, 0, 64, 64 )
+region = Rect2( 1792, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=17]
 atlas = ExtResource( 1 )
-region = Rect2( 1344, 0, 64, 64 )
+region = Rect2( 1856, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=18]
 atlas = ExtResource( 1 )
-region = Rect2( 1408, 0, 64, 64 )
+region = Rect2( 1920, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=19]
 atlas = ExtResource( 1 )
-region = Rect2( 1472, 0, 64, 64 )
+region = Rect2( 1984, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=20]
 atlas = ExtResource( 1 )
-region = Rect2( 384, 0, 64, 64 )
+region = Rect2( 768, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=21]
 atlas = ExtResource( 1 )
-region = Rect2( 448, 0, 64, 64 )
+region = Rect2( 832, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=22]
 atlas = ExtResource( 1 )
-region = Rect2( 512, 0, 64, 64 )
+region = Rect2( 896, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=23]
 atlas = ExtResource( 1 )
-region = Rect2( 576, 0, 64, 64 )
+region = Rect2( 960, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=24]
 atlas = ExtResource( 1 )
-region = Rect2( 640, 0, 64, 64 )
+region = Rect2( 1024, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=25]
 atlas = ExtResource( 1 )
+region = Rect2( 1088, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=26]
+atlas = ExtResource( 1 )
+region = Rect2( 1536, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=27]
+atlas = ExtResource( 1 )
+region = Rect2( 1600, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=28]
+atlas = ExtResource( 1 )
+region = Rect2( 1664, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=29]
+atlas = ExtResource( 1 )
+region = Rect2( 1728, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=30]
+atlas = ExtResource( 1 )
+region = Rect2( 384, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=31]
+atlas = ExtResource( 1 )
+region = Rect2( 448, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=32]
+atlas = ExtResource( 1 )
+region = Rect2( 512, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=33]
+atlas = ExtResource( 1 )
+region = Rect2( 576, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=34]
+atlas = ExtResource( 1 )
+region = Rect2( 640, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=35]
+atlas = ExtResource( 1 )
 region = Rect2( 704, 0, 64, 64 )
 
-[sub_resource type="SpriteFrames" id=26]
+[sub_resource type="AtlasTexture" id=36]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=37]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=38]
+atlas = ExtResource( 1 )
+region = Rect2( 128, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=39]
+atlas = ExtResource( 1 )
+region = Rect2( 192, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=40]
+atlas = ExtResource( 1 )
+region = Rect2( 256, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=41]
+atlas = ExtResource( 1 )
+region = Rect2( 320, 0, 64, 64 )
+
+[sub_resource type="SpriteFrames" id=42]
 animations = [ {
-"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ) ],
-"loop": true,
-"name": "move_left",
-"speed": 10.0
+"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ) ],
+"loop": false,
+"name": "attack_left",
+"speed": 15.0
 }, {
-"frames": [ SubResource( 8 ), SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
-"loop": true,
-"name": "move_right",
-"speed": 10.0
+"frames": [ SubResource( 6 ), SubResource( 7 ), SubResource( 8 ), SubResource( 9 ) ],
+"loop": false,
+"name": "attack_down",
+"speed": 15.0
 }, {
-"frames": [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ) ],
+"frames": [ SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ) ],
 "loop": true,
 "name": "move_down",
 "speed": 10.0
 }, {
+"frames": [ SubResource( 16 ), SubResource( 17 ), SubResource( 18 ), SubResource( 19 ) ],
+"loop": false,
+"name": "attack_up",
+"speed": 15.0
+}, {
 "frames": [ SubResource( 20 ), SubResource( 21 ), SubResource( 22 ), SubResource( 23 ), SubResource( 24 ), SubResource( 25 ) ],
+"loop": true,
+"name": "move_left",
+"speed": 10.0
+}, {
+"frames": [ SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ) ],
+"loop": false,
+"name": "attack_right",
+"speed": 15.0
+}, {
+"frames": [ SubResource( 30 ), SubResource( 31 ), SubResource( 32 ), SubResource( 33 ), SubResource( 34 ), SubResource( 35 ) ],
 "loop": true,
 "name": "move_up",
 "speed": 10.0
+}, {
+"frames": [ SubResource( 36 ), SubResource( 37 ), SubResource( 38 ), SubResource( 39 ), SubResource( 40 ), SubResource( 41 ) ],
+"loop": true,
+"name": "move_right",
+"speed": 10.0
 } ]
 
-[sub_resource type="CapsuleShape2D" id=27]
+[sub_resource type="CapsuleShape2D" id=43]
 radius = 3.6072
 height = 5.29993
 
@@ -196,7 +297,7 @@ script = SubResource( 1 )
 
 [node name="AnimationPlayer" type="AnimatedSprite" parent="."]
 position = Vector2( 1.05553, -9.15986 )
-frames = SubResource( 26 )
+frames = SubResource( 42 )
 animation = "move_down"
 __meta__ = {
 "_edit_lock_": true
@@ -205,7 +306,7 @@ __meta__ = {
 [node name="Body" type="CollisionShape2D" parent="."]
 position = Vector2( -0.00216675, 0.0794144 )
 rotation = -1.5708
-shape = SubResource( 27 )
+shape = SubResource( 43 )
 __meta__ = {
 "_edit_lock_": true
 }
