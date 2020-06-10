@@ -5,28 +5,53 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
 
+enum { IDLE, MOVE, ATTACK, ROLL }
+
 export var _speed = 100
 export var _acceleration = 500
 
 var _velocity = Vector2.ZERO
+var _state = IDLE
 
 onready var _animationPlayer = $AnimationPlayer
 
 func _physics_process(delta: float) -> void:
-	var direction = Vector2(
-		Input.get_action_strength(\"player_move_right\") - Input.get_action_strength(\"player_move_left\"),
-		Input.get_action_strength(\"player_move_down\") - Input.get_action_strength(\"player_move_up\")
-	)
+	match _state:
+		IDLE: _idle()
+		MOVE: _move(delta)
+		ATTACK: pass
+		ROLL: pass
 	
-	match _to_animation(direction):
-		\"stop\":
-			_animationPlayer.stop()
-			_animationPlayer.frame = 0
-		var animation:
-			_animationPlayer.play(animation)
-		
-	_velocity = _velocity.move_toward(direction.normalized() * _speed, _acceleration * delta)		
-	_velocity = move_and_slide(_velocity)
+
+func _idle() -> void:
+	if _get_direction() != Vector2.ZERO:
+		_state = MOVE
+	elif _animationPlayer.playing == true:
+		_animationPlayer.stop()
+		_animationPlayer.frame = 0
+	
+	
+func _move(delta: float) -> void:
+	var direction = _get_direction()
+	
+	if direction == Vector2.ZERO and _velocity == Vector2.ZERO: 
+		_state = IDLE
+	else:	
+		match _to_animation(direction):
+			\"none\":
+				pass
+			var animation:
+				_animationPlayer.play(animation)
+			
+		_velocity = _velocity.move_toward(direction.normalized() * _speed, _acceleration * delta)		
+		_velocity = move_and_slide(_velocity)
+
+
+func _get_direction() -> Vector2:
+	return Vector2(
+				Input.get_action_strength(\"player_move_right\") - Input.get_action_strength(\"player_move_left\"),
+				Input.get_action_strength(\"player_move_down\") - Input.get_action_strength(\"player_move_up\")
+			)
 
 
 func _to_animation(direction: Vector2) -> String:
@@ -40,7 +65,7 @@ func _to_animation(direction: Vector2) -> String:
 		[0.0, -1.0]:
 			return \"move_up\"
 		_:
-			return \"stop\"
+			return \"none\"
 "
 
 [sub_resource type="AtlasTexture" id=2]
