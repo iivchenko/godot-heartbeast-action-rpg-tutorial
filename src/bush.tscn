@@ -7,6 +7,7 @@ radius = 5.38343
 height = 14.576
 
 [node name="Bush" type="StaticBody2D"]
+collision_mask = 2
 
 [node name="Sprite" type="Sprite" parent="."]
 position = Vector2( 0, -4.791 )
