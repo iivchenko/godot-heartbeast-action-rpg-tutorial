@@ -232,7 +232,6 @@ func _draw() -> void:
 "
 
 [node name="Bat" type="KinematicBody2D"]
-collision_layer = 0
 script = SubResource( 1 )
 health = 5
 

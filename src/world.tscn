@@ -14,7 +14,7 @@
 script/source = "extends Node2D
 
 onready var _player = $Objects/Player
-onready var _hud = $HeadsUpDisplay
+onready var _hud = $Interface/HeadsUpDisplay
 
 func _ready() -> void:
 	_player.connect(\"damaged\", self, \"_on_player_damaged\")
@@ -502,6 +502,19 @@ points = PoolVector2Array( 0, 0, 32, 0, 32, 32, 0, 32 )
 [node name="World" type="Node2D"]
 script = SubResource( 50 )
 
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="HeadsUpDisplay" parent="Interface" instance=ExtResource( 9 )]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 8.0
+margin_bottom = 8.0
+
+[node name="MainCamera" type="Camera2D" parent="."]
+position = Vector2( 152, 24 )
+current = true
+smoothing_enabled = true
+
 [node name="Map" type="Node2D" parent="."]
 __meta__ = {
 "_edit_group_": true,
@@ -532,6 +545,9 @@ tile_data = PoolIntArray( -1, 0, 0, -65536, 0, 1, -65535, 0, 1, -65534, 0, 1, -6
 
 [node name="Player" parent="Objects" instance=ExtResource( 1 )]
 position = Vector2( 152, 24 )
+
+[node name="CameraAttach" type="RemoteTransform2D" parent="Objects/Player"]
+remote_path = NodePath("../../../MainCamera")
 
 [node name="Grass" type="YSort" parent="Objects"]
 
@@ -595,9 +611,3 @@ position = Vector2( 272, 144 )
 
 [node name="Bat4" parent="Objects" instance=ExtResource( 7 )]
 position = Vector2( 16, 80 )
-
-[node name="HeadsUpDisplay" parent="." instance=ExtResource( 9 )]
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 8.0
-margin_bottom = 8.0
