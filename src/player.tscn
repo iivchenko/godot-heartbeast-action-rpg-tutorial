@@ -7,13 +7,18 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
 
+signal damaged
+signal died
+
 enum { IDLE, MOVE, ATTACK, ROLL }
 
-export var _health = 5
+export var max_health = 5
 export var _damage = 1
 export var _speed = 100
 export var _acceleration = 500
 export var _roll_speed = 175
+
+var health
 
 var _velocity = Vector2.ZERO
 var _direction = Vector2.DOWN
@@ -28,6 +33,9 @@ func _ready() -> void:
 	_hitbox.visible = true
 	$HurtBox.visible = true
 	$Body.visible = true
+	
+	health = max_health
+
 
 func _process(delta: float) -> void:
 	match _state:
@@ -130,9 +138,12 @@ func _as_string(direction: Vector2) -> String:
 
 
 func _on_hurt(area: Area2D) -> void:
-	_health -= area.damage
+	health -= area.damage
 		
-	if _health <= 0:
+	emit_signal(\"damaged\", health)
+	
+	if health <= 0:
+		emit_signal(\"died\")
 		queue_free()
 	else:
 		_effect.visible = true
@@ -140,7 +151,6 @@ func _on_hurt(area: Area2D) -> void:
 		_effect.play(\"hit\")
 		yield(_effect, \"animation_finished\")
 		_effect.visible = false
-
 "
 
 [sub_resource type="AtlasTexture" id=2]

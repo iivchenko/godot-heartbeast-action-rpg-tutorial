@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/sprites/ui/heart_ui_empty.png" type="Texture" id=1]
+[ext_resource path="res://assets/sprites/ui/heart_ui_full.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+const HEART_WIDTH = 15 #px
+
+var max_hearts = 1 setget max_hearts_set, max_hearts_get
+var hearts = 0 setget hearts_set, hearts_get
+
+onready var _empty = $HeartsEmpty
+onready var _full = $HeartsFull
+
+func _ready() -> void:
+	_update_hearts()
+
+
+func hearts_set(value: int) -> void:
+	hearts = min(value, max_hearts)
+	_update_hearts()
+
+
+func hearts_get() -> int:
+	return hearts
+
+
+func max_hearts_set(value: int) -> void:
+	max_hearts = value
+	hearts = min(hearts, max_hearts)
+	_update_hearts()
+
+
+func max_hearts_get() -> int:
+	return max_hearts
+
+
+func _update_hearts() -> void:
+	_empty.rect_size.x = max_hearts * HEART_WIDTH
+	_full.rect_size.x = hearts * HEART_WIDTH
+"
+
+[node name="HeadsUpDisplay" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeartsEmpty" type="TextureRect" parent="."]
+margin_right = 15.0
+margin_bottom = 11.0
+texture = ExtResource( 1 )
+stretch_mode = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeartsFull" type="TextureRect" parent="."]
+margin_right = 15.0
+margin_bottom = 11.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 2
