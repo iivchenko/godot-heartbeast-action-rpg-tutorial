@@ -27,6 +27,10 @@ onready var _timer = $Timer
 onready var _state = IDLE
 
 func _ready() -> void:
+	$HitBox.visible = true
+	$HurtBox.visible = true
+	$Body.visible = true
+	
 	var shape = CircleShape2D.new()
 	shape.radius = _view_radius
 	_visual_body.shape = shape
@@ -85,37 +89,38 @@ func _on_player_hit(_area: Area2D) -> void:
 	$HitBox/Body.set_deferred(\"disabled\", true)
 	_timer.start(0.5)
 
+
 func _on_can_attack() -> void:
 	$HitBox/Body.set_deferred(\"disabled\", false)
 "
 
 [sub_resource type="AtlasTexture" id=2]
-atlas = ExtResource( 1 )
-region = Rect2( 0, 0, 16, 24 )
-
-[sub_resource type="AtlasTexture" id=3]
-atlas = ExtResource( 1 )
-region = Rect2( 16, 0, 16, 24 )
-
-[sub_resource type="AtlasTexture" id=4]
-atlas = ExtResource( 1 )
-region = Rect2( 32, 0, 16, 24 )
-
-[sub_resource type="AtlasTexture" id=5]
-atlas = ExtResource( 1 )
-region = Rect2( 48, 0, 16, 24 )
-
-[sub_resource type="AtlasTexture" id=6]
-atlas = ExtResource( 1 )
-region = Rect2( 64, 0, 16, 24 )
-
-[sub_resource type="AtlasTexture" id=7]
 atlas = ExtResource( 4 )
 region = Rect2( 0, 0, 24, 24 )
 
-[sub_resource type="AtlasTexture" id=8]
+[sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 4 )
 region = Rect2( 24, 0, 24, 24 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=5]
+atlas = ExtResource( 1 )
+region = Rect2( 16, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 1 )
+region = Rect2( 48, 0, 16, 24 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 16, 24 )
 
 [sub_resource type="AtlasTexture" id=9]
 atlas = ExtResource( 3 )
@@ -159,14 +164,14 @@ region = Rect2( 288, 0, 32, 32 )
 
 [sub_resource type="SpriteFrames" id=19]
 animations = [ {
-"frames": [ SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ) ],
-"loop": true,
-"name": "fly",
-"speed": 10.0
-}, {
-"frames": [ SubResource( 7 ), SubResource( 8 ) ],
+"frames": [ SubResource( 2 ), SubResource( 3 ) ],
 "loop": true,
 "name": "hit",
+"speed": 10.0
+}, {
+"frames": [ SubResource( 4 ), SubResource( 5 ), SubResource( 6 ), SubResource( 7 ), SubResource( 8 ) ],
+"loop": true,
+"name": "fly",
 "speed": 10.0
 }, {
 "frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ), SubResource( 18 ) ],
@@ -175,17 +180,17 @@ animations = [ {
 "speed": 10.0
 } ]
 
-[sub_resource type="AtlasTexture" id=67]
+[sub_resource type="AtlasTexture" id=20]
 atlas = ExtResource( 4 )
 region = Rect2( 0, 0, 24, 24 )
 
-[sub_resource type="AtlasTexture" id=68]
+[sub_resource type="AtlasTexture" id=21]
 atlas = ExtResource( 4 )
 region = Rect2( 24, 0, 24, 24 )
 
-[sub_resource type="SpriteFrames" id=69]
+[sub_resource type="SpriteFrames" id=22]
 animations = [ {
-"frames": [ SubResource( 67 ), SubResource( 68 ) ],
+"frames": [ SubResource( 20 ), SubResource( 21 ) ],
 "loop": false,
 "name": "hit",
 "speed": 15.0
@@ -194,7 +199,7 @@ animations = [ {
 [sub_resource type="CircleShape2D" id=23]
 radius = 3.88743
 
-[sub_resource type="GDScript" id=64]
+[sub_resource type="GDScript" id=24]
 script/source = "extends Area2D
 
 var damage = 1
@@ -205,13 +210,13 @@ func _ready() -> void:
 	damage = get_parent()._damage
 "
 
-[sub_resource type="CircleShape2D" id=70]
+[sub_resource type="CircleShape2D" id=25]
 radius = 6.14258
 
-[sub_resource type="CircleShape2D" id=24]
+[sub_resource type="CircleShape2D" id=26]
 radius = 6.10864
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=27]
 script/source = "tool
 extends Area2D
 
@@ -234,7 +239,6 @@ health = 5
 [node name="Animation" type="AnimatedSprite" parent="."]
 frames = SubResource( 19 )
 animation = "fly"
-frame = 4
 playing = true
 offset = Vector2( 0, -12 )
 
@@ -242,40 +246,43 @@ offset = Vector2( 0, -12 )
 visible = false
 position = Vector2( 0.524094, -14.8056 )
 scale = Vector2( 0.406029, 0.43005 )
-frames = SubResource( 69 )
+frames = SubResource( 22 )
 animation = "hit"
 
 [node name="ShadowSprite" type="Sprite" parent="."]
 texture = ExtResource( 2 )
 
 [node name="Body" type="CollisionShape2D" parent="."]
+visible = false
 shape = SubResource( 23 )
 
 [node name="HitBox" type="Area2D" parent="."]
+visible = false
 position = Vector2( 0.607021, -14.957 )
 collision_layer = 0
 collision_mask = 16
-script = SubResource( 64 )
+script = SubResource( 24 )
 __meta__ = {
 "_edit_group_": true
 }
 
 [node name="Body" type="CollisionShape2D" parent="HitBox"]
-shape = SubResource( 70 )
+shape = SubResource( 25 )
 
 [node name="HurtBox" type="Area2D" parent="."]
+visible = false
 collision_layer = 8
 collision_mask = 4
 
 [node name="Body" type="CollisionShape2D" parent="HurtBox"]
 position = Vector2( 0.626015, -14.935 )
-shape = SubResource( 24 )
+shape = SubResource( 26 )
 
 [node name="VisualArea" type="Area2D" parent="."]
 monitorable = false
 collision_layer = 0
 collision_mask = 2
-script = SubResource( 25 )
+script = SubResource( 27 )
 
 [node name="Body" type="CollisionShape2D" parent="VisualArea"]
 
